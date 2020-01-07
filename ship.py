@@ -53,7 +53,6 @@ blue = (0,0,255)
 yellow = (0,255,255)
 purple = (255,0,255)
 
-ship_color = green
 
 speed_delay = .1
 
@@ -62,13 +61,15 @@ speed_delay = .1
 ###################################
 class Ship():
   def __init__(self, x, y):
-    global ship_color
+    ship_color = green
+   
 
     self.x = x  # x and y gonna be top-left corner of ship. 
     self.y = y  # orientation doesn't matter
 
     self.dir = 0   # 0 = Up, 1 = Up-right, 2=right...etc to 7=up-left
 
+    self.ship_size = 3
     self.image = Image.new("RGB", (3,3))
     self.draw  = ImageDraw.Draw(self.image)
 
@@ -165,9 +166,9 @@ class Ship():
       exit(1) 
   
     # Make sure our new position isn't off the screen
-    if ((new_x >= 0) and (new_x < matrix_columns)):
+    if ((new_x >= 0) and (new_x <= matrix_columns-self.ship_size)):
       self.x = new_x
-    if ((new_y >= 0) and (new_y < matrix_rows)):
+    if ((new_y >= 0) and (new_y <= matrix_rows-self.ship_size)):
       self.y = new_y 
 
 ###################################
@@ -191,9 +192,23 @@ ship = Ship(5,5)
 ship.rotate_right()
 ship.show()
 
+last_update_time = datetime.now()
 
 while True:
-  time.sleep(1) 
+
+  input = wrapper.get_next_input()
+  if (input == None):
+    key = None
+  else:
+    key = input[1]
+
   ship.erase()
-  ship.move() 
-  ship.show()
+  if (key == "left"):
+    ship.rotate_left()
+  elif (key == "right"):
+    ship.rotate_right()
+  elif (key == "up"):
+    ship.move()
+  ship.show() 
+
+  time.sleep(speed_delay) 
