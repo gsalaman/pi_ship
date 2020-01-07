@@ -75,16 +75,39 @@ class Ship():
     self.draw.line((1,0,0,2),fill=ship_color)
     self.draw.line((1,0,2,2),fill=ship_color)
 
+    self.images = []
+    self.images.append(self.image)
+
+    self.base_image_45 = Image.new("RGB", (3,3))
+    draw_45 = ImageDraw.Draw(self.base_image_45)
+    draw_45.line((0,0,2,0),fill=ship_color)
+    draw_45.line((2,0,2,2),fill=ship_color)
+  
+    self.images.append(self.base_image_45)
+
+    self.images.append(self.image.rotate(-90))
+    self.images.append(self.base_image_45.rotate(-90))
+
+    self.images.append(self.image.rotate(180))
+    self.images.append(self.base_image_45.rotate(180))
+
+    self.images.append(self.image.rotate(90))
+    self.images.append(self.base_image_45.rotate(90))
+
   def show(self):
     global matrix
 
-    matrix.SetImage(self.image, self.x, self.y)
+    matrix.SetImage(self.images[self.dir], self.x, self.y)
 
   def rotate_right(self):
-    pass
+    self.dir = self.dir + 1
+    if (self.dir > 7):
+      self.dir = 0
 
   def rotate_left(self):
-    pass
+    self.dir = self.dir - 1
+    if (self.dir < 0):
+      self.dir = 7
 
   def move(self):
     pass
@@ -100,3 +123,5 @@ ship.show()
 
 while True:
   time.sleep(1) 
+  ship.rotate_left() 
+  ship.show()
