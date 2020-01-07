@@ -8,7 +8,7 @@
 import time
 from datetime import datetime
 
-#from gamepad_wrapper import Gamepad_wrapper
+from gamepad_wrapper import Gamepad_wrapper
 
 ###################################
 # Graphics imports, constants and structures
@@ -99,6 +99,12 @@ class Ship():
 
     matrix.SetImage(self.images[self.dir], self.x, self.y)
 
+  def erase(self):
+    global matrix
+    
+    blank_image = Image.new("RGB", (3,3))
+    matrix.SetImage(blank_image, self.x, self.y)
+
   def rotate_right(self):
     self.dir = self.dir + 1
     if (self.dir > 7):
@@ -110,18 +116,84 @@ class Ship():
       self.dir = 7
 
   def move(self):
-    pass
+    global matrix_rows
+    global matrix_columns
+
+    # dir = up
+    if (self.dir == 0):
+      new_x = self.x
+      new_y = self.y - 1
+
+    # dir = up-right
+    elif (self.dir == 1):
+      new_x = self.x + 1
+      new_y = self.y - 1
+
+    # dir = right
+    elif (self.dir == 2):
+      new_x = self.x + 1
+      new_y = self.y
+
+    # dir = down-right
+    elif (self.dir == 3):
+      new_x = self.x + 1
+      new_y = self.y + 1
+
+    # dir = down
+    elif (self.dir == 4):
+      new_x = self.x
+      new_y = self.y + 1
+
+    # dir = down-left
+    elif (self.dir == 5):
+      new_x = self.x - 1
+      new_y = self.y + 1
+
+    # dir = left
+    elif (self.dir == 6):
+      new_x = self.x - 1
+      new_y = self.y
+
+    # dir = up-left
+    elif (self.dir == 7):
+      new_x = self.x - 1 
+      new_y = self.y - 1
+    
+    #invalid dir!!!
+    else:
+      print("Invalid dir in move!!!")
+      exit(1) 
+  
+    # Make sure our new position isn't off the screen
+    if ((new_x >= 0) and (new_x < matrix_columns)):
+      self.x = new_x
+    if ((new_y >= 0) and (new_y < matrix_rows)):
+      self.y = new_y 
 
 ###################################
 # Main loop 
 ###################################
+init_image = Image.new("RGB", (total_columns, total_rows))
+init_draw = ImageDraw.Draw(init_image)
+init_draw.text((0,0),"Waiting for controller", fill=red)
+matrix.SetImage(init_image, 0,0)
 
-#wrapper = Gamepad_wrapper(1)
+wrapper = Gamepad_wrapper(1)
+
+while wrapper.player_count() != 1:
+  time.sleep(0.001)
+
+# blank the screen
+init_draw.rectangle((0,0,total_columns,total_rows), fill=black)
+matrix.SetImage(init_image, 0,0)
 
 ship = Ship(5,5)
+ship.rotate_right()
 ship.show()
+
 
 while True:
   time.sleep(1) 
-  ship.rotate_left() 
+  ship.erase()
+  ship.move() 
   ship.show()
